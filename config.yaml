@@ -1,0 +1,174 @@
+data_paths:
+  raw_data: 'Data/Raw/ChurnModelling.csv'
+  processed_data:  ' Data/Processed/churn_handle_nullvalues.csv'
+  imputed_data:  ' Data/Processed/churn_imputed.csv'
+  processed_dir: 'Data/Processed'
+  artifacts_dir: 'Artifacts'
+  data_artifacts_dir: 'Artifacts/Data'
+  model_artifacts_dir: 'Artifacts/Models'
+  X_train: 'Artifacts/Data/X_train.csv'
+  X_test: 'Artifacts/Data/X_test.csv'
+  y_train: 'Artifacts/Data/y_train.csv'
+  y_test: 'Artifacts/Data/y_test.csv'
+
+
+columns:
+  target_columns: 'Exited'
+  drop_columns: ['CustomerID','RowNumber']
+  outlier_columns: ['Age','CreditScore','NumOfProducts']
+  numerical_columns: ['Balance','EstimatedSalary']
+  llm_columns: ['Firstname']
+  nominal_columns: ['Gender','Geography']
+  feature_columns:
+  - "CreditScore"
+  - "Geography"
+  - "Gender"
+  - "Age"
+  - "Tenure"
+  - "Balance"
+  - "NumOfProducts"
+  - "HasCrCard"
+  - "IsActiveMember"
+  - "EstimatedSalary"
+
+missing_values:
+  strategy: 'fill'
+  method:
+    Age:
+      strategy: 'fill'
+      method: 'mean'
+      relevant_column: 'Age'
+    Gender:
+      strategy: 'fill'
+      method: 'mode'
+      relevant_column: 'Gender'
+      custom_gender_imputer: True
+
+outlier_detection:
+  detection: 'iqr'
+  handle_method: 'remove'
+  z_score_threshold: 3
+
+feature_binning:
+  credit_score_binning:
+    Poor: [348,566]
+    Fair: [566,627]
+    Good: [627,678]
+    Very Good: [678,735]
+    Excellent: [735,850]
+  credit_score_mapping:
+    Poor: 0
+    Fair: 1
+    Good: 2
+    Very Good: 3
+    Excellent: 4
+
+feature_encoding:
+  nominal_columns: ['Geography','Gender']
+  ordinal_mapping:
+    CreditScoreBins:
+      Poor: 0
+      Fair: 1
+      Good: 2
+      Very Good: 3
+      Excellent: 4
+
+
+feature_scaling:
+  scaling_method: 'standard'
+  columns_to_scale: ['Balance','EstimatedSalary','Tenure','Age']
+
+
+
+training:
+  default_model_type: "random_forest"
+  default_training_strategy: "cv"
+  cv_folds: 5
+  random_state: 42
+  test_size: 0.2
+  validation_split: 0.2
+  early_stopping_patience: 10
+  max_iterations: 1000
+  hyperparameter_tuning:
+    enabled: false
+    search_method: "grid"
+    cv_folds: 5
+    n_iter: 20
+
+model:
+  model_type: "random_forest"
+  training_strategy: "cv"
+  data_path: "Data/Raw/ChurnModelling.csv"
+  model_path: "Artifacts/Models/random_forest_cv_model.pkl"
+  evaluation_path: "Artifacts/Evaluation/random_forest_cv_evaluation_report.txt"
+  model_params:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+  model_types:
+    random_forest:
+      n_estimators: 100
+      max_depth: 10
+      random_state: 42
+    gradient_boosting:
+      n_estimators: 100
+      max_depth: 5
+      random_state: 42
+    logistic_regression:
+      random_state: 42
+      max_iter: 1000
+    svm:
+      random_state: 42
+      probability: true
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1-score"
+  cv_folds: 5
+  random_state: 42
+
+deployment:
+  model_name: "churn_analysis_model"
+  model_version: "1.0.0"
+  api_endpoint: "/predict"
+  batch_size: 1000
+
+inference:
+  model_name: "random_forest_cv_model"
+  data_path: "Artifacts/Data/X_test.csv"
+  sample_size: 100
+  save_path: "Artifacts/Predictions/predictions.csv"
+  batch_size: 1000
+  return_proba: true
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  file: "pipeline.log"
+
+mlflow:
+  tracking_uri: "file:./mlruns"  # Local file-based tracking
+  experiment_name: "Zuu Crew Churn Analysis"
+  model_registry_name: "churn_prediction"
+  artifact_path: "model"
+  run_name_prefix: "churn_run"
+  tags:
+    project: "customer_churn_prediction"
+    team: "ml_engineering"
+    environment: "development"
+  autolog: true
+
+environment:
+  experiment_name: "churn_analysis"
+
+pipeline:
+  data_pipeline_name: "data_processing_pipeline"
+  training_pipeline_name: "model_training_pipeline"
+  deployment_pipeline_name: "model_deployment_pipeline"
+  inference_pipeline_name: "inference_pipeline"
+  enable_cache: false
+
+  
