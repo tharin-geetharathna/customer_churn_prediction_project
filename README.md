@@ -1,0 +1,2 @@
+# customer_churn_prediction_project
+Building production grade customer churn prediction application
