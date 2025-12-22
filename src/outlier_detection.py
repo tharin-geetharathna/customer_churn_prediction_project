@@ -32,11 +32,14 @@ class OutlierDetector():
     def detect_outliers(self,df,numerical_columns):
         return self.strategy.detect_outliers(df,numerical_columns)
     
-    def handle_outliers(self, df, numerical_columns,method='remove'): 
+    def handle_outliers(self, df, numerical_columns,method='remove'):
         outliers= self.detect_outliers(df,numerical_columns)
         outlier_count = outliers.any(axis=1).sum()
         rows_to_drop = outlier_count>=2
+        logging.info(f"Outliers have been handdles successfuly")
         return df[~rows_to_drop]
+
+
 
 
     
