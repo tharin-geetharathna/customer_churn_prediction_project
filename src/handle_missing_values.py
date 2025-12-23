@@ -5,6 +5,7 @@ from abc import ABC,abstractmethod
 from pydantic import BaseModel
 import pandas as pd
 logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
+from dotenv import load_dotenv
 load_dotenv()
 
 
@@ -15,12 +16,12 @@ class MissingValueHandlingStrategy(ABC):
         pass
 
 class DropMissingValues(MissingValueHandlingStrategy):
-    def __init__(self,drop_columns=[]):
-        self.drop_columns= drop_columns
-        logging.info(f" Dropping columns {self.drop_columns}")
+    def __init__(self,critical_columns=[]):
+        self.critical_columns= critical_columns
+        logging.info(f" Dropping columns {self.critical_columns}")
 
     def handle_missing_values(self, df):
-        drop_cleaned_df= df.dropna(subset=self.drop_columns)
+        drop_cleaned_df= df.dropna(subset=self.critical_columns)
         n_dropped = len(df)- len(drop_cleaned_df)
         logging.info(f"Dropped {n_dropped} rows due to missing values")
         return drop_cleaned_df
@@ -38,9 +39,6 @@ class FillMissingValueStrategy(MissingValueHandlingStrategy):
         self.fill_value= fill_value
         self.is_customer_imputer= is_customer_imputer
         self.custom_imputer= custom_imputer
-
-        
-
 
     def handle_missing_values(self, df):
         if self.is_customer_imputer:
@@ -62,7 +60,7 @@ class GenderImputer():
             """
             response= self.groq_client.chat.completions.create(
                 model='llama-3.3-70b-versatile',
-                message=[
+                messages=[
                     {
                         'role':'user',
                         'content':prompt
@@ -85,7 +83,7 @@ class GenderImputer():
                     logging.info(f" Imputed missing gender for {firstname} {lastname} as {gender}")
                 else:
                     logging.info(f" Could not impute missing gender for {firstname} {lastname}")
-                return df
+            return df
             
 
 

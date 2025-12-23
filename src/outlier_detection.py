@@ -1,12 +1,13 @@
 import logging
 from abc import ABC, abstractmethod
 import pandas as pd
+from typing import List
 logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - %(message)s')
 
 
 class OutlierDetectionStrategy(ABC):
     @abstractmethod
-    def detect_outliers(self,df: pd.DataFrame, columns : List)-> pd.DataFrame:
+    def detect_outliers(self,df: pd.DataFrame, columns : List[str])-> pd.DataFrame:
         pass
 
 class IQROutlierDetection(OutlierDetectionStrategy):

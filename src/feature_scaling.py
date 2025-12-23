@@ -2,11 +2,12 @@ import pandas as pd
 import logging
 from abc import ABC, abstractmethod
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from typing import List
 logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - %(message)s')
 
 class FeatureScalingStrategy(ABC):
     @abstractmethod
-    def scale_features(self,df: pd.DataFrame,scale_columns:List)-> pd.DataFrame:
+    def scale_features(self,df: pd.DataFrame,scale_columns:List[str])-> pd.DataFrame:
         pass
 
 

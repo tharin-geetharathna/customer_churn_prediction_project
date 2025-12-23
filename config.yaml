@@ -4,20 +4,21 @@ data_paths:
   imputed_data:  ' Data/Processed/churn_imputed.csv'
   processed_dir: 'Data/Processed'
   artifacts_dir: 'Artifacts'
-  data_artifacts_dir: 'Artifacts/Data'
+  data_artifacts_dir: 'Artifacts/Data_splits'
   model_artifacts_dir: 'Artifacts/Models'
-  X_train: 'Artifacts/Data/X_train.csv'
-  X_test: 'Artifacts/Data/X_test.csv'
-  y_train: 'Artifacts/Data/y_train.csv'
-  y_test: 'Artifacts/Data/y_test.csv'
+  X_train: 'Artifacts/Data_splits/X_train.csv'
+  X_test: 'Artifacts/Data_splits/X_test.csv'
+  y_train: 'Artifacts/Data_splits/y_train.csv'
+  y_test: 'Artifacts/Data_splits/y_test.csv'
+  gender_imputed: 'Data/Processed/gender_imputed.csv'
 
 
 columns:
   target_columns: 'Exited'
-  drop_columns: ['CustomerID','RowNumber']
+  drop_columns: ['CustomerId','RowNumber']
   outlier_columns: ['Age','CreditScore','NumOfProducts']
   numerical_columns: ['Balance','EstimatedSalary']
-  llm_columns: ['Firstname']
+  critical_columns: ['Firstname']
   nominal_columns: ['Gender','Geography']
   feature_columns:
   - "CreditScore"
