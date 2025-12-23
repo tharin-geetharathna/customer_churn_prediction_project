@@ -13,7 +13,7 @@ logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - 
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','src'))
 from data_ingestion import DataIngestorCSV
 from handle_missing_values import DropMissingValues,FillMissingValueStrategy,GenderImputer
-from outlier_detection import IQROutlierDetection
+from outlier_detection import IQROutlierDetection,OutlierDetector
 from feature_binning import CustomBinningStrategy
 from feature_encoding import NominalEncoding,Ordinalencoding
 from feature_scaling import MinMaxScaler
@@ -23,7 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
 from config import get_data_paths,get_columns,get_missing_values_config,get_outlier_config,get_binning_config,get_encoding_config,get_scaling_config,get_splitting_config
 
 def datapipeline(
-        data_path: str= 'Data/Raw/ChurnModelling.csv',
+        data_path: str= 'data/raw/ChurnModelling.csv',
         target_column: str = 'Exited',
         test_size: float= 0.2,
         force_rebuild: bool = False
@@ -59,20 +59,30 @@ def datapipeline(
     print(f"Shape of the data after ingestion { df.shape}")
 
     print("2. Handling missing values")
-    critical_handler = DropMissingValues(critical_columns=columns['critical_columns'])
-    age_handler= FillMissingValueStrategy(
-                 imputing_column= 'Age',
-                 method='mean'
-                 )
-    gender_handler= FillMissingValueStrategy(
-                 imputing_column= 'Gender',
-                 is_customer_imputer=True,
-                 custom_imputer=GenderImputer()
-                 )
-    df= critical_handler.handle_missing_values(df)
-    df= age_handler.handle_missing_values(df)
-    df= gender_handler.handle_missing_values(df)
-    print(f" Shape of the data after handling missing values {df.shape}")
+    if not os.path.exists(os.path.join(os.path.dirname(__file__),'..','Data','Processed','temporary_imputed.csv')):
+        critical_handler = DropMissingValues(critical_columns=columns['critical_columns'])
+        age_handler= FillMissingValueStrategy(
+                    imputing_column= 'Age',
+                    method='mean'
+                    )
+        gender_handler= FillMissingValueStrategy(
+                    imputing_column= 'Gender',
+                    is_customer_imputer=True,
+                    custom_imputer=GenderImputer()
+                    )
+        df= critical_handler.handle_missing_values(df)
+        df= age_handler.handle_missing_values(df)
+        df= gender_handler.handle_missing_values(df)
+        df.to_csv('data/processed/temporary_imputed.csv',index=False)
+        
+    df= pd.read_csv("data/processed/temporary_imputed.csv")
+    print(f"Shape of the data after handling missing values {df.shape}")
+    print("3. Handling outliers")
+    outlier_detector = OutlierDetector(IQROutlierDetection())
+    df= outlier_detector.handle_outliers(df,outlier_columns= columns['outlier_columns'])
+    print(f"Shape of the data after handling outliers {df.shape}")
+
+
 
 
     
