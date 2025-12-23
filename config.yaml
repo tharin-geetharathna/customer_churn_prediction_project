@@ -1,22 +1,22 @@
 data_paths:
-  raw_data: 'Data/Raw/ChurnModelling.csv'
-  processed_data:  ' Data/Processed/churn_handle_nullvalues.csv'
-  imputed_data:  ' Data/Processed/churn_imputed.csv'
-  processed_dir: 'Data/Processed'
-  artifacts_dir: 'Artifacts'
-  data_artifacts_dir: 'Artifacts/Data_splits'
-  model_artifacts_dir: 'Artifacts/Models'
-  X_train: 'Artifacts/Data_splits/X_train.csv'
-  X_test: 'Artifacts/Data_splits/X_test.csv'
-  y_train: 'Artifacts/Data_splits/y_train.csv'
-  y_test: 'Artifacts/Data_splits/y_test.csv'
-  gender_imputed: 'Data/Processed/gender_imputed.csv'
+  raw_data: 'data/raw/ChurnModelling.csv'
+  processed_data:  ' data/processed/churn_handle_nullvalues.csv'
+  imputed_data:  ' data/processed/churn_imputed.csv'
+  processed_dir: 'data/processed'
+  artifacts_dir: 'artifacts/'
+  data_artifacts_dir: 'artifacts/data_splits'
+  model_artifacts_dir: 'artifacts/models'
+  X_train: 'artifacts/data_splits/X_train.csv'
+  X_test: 'artifacts/data_splits/X_test.csv'
+  y_train: 'artifacts/data_splits/y_train.csv'
+  y_test: 'artifacts/data_splits/y_test.csv'
+  temporary_imputed: 'data/processed/temporary_imputed.csv'
 
 
 columns:
   target_columns: 'Exited'
   drop_columns: ['CustomerId','RowNumber']
-  outlier_columns: ['Age','CreditScore','NumOfProducts']
+  outlier_columns: ['Age','CreditScore']
   numerical_columns: ['Balance','EstimatedSalary']
   critical_columns: ['Firstname']
   nominal_columns: ['Gender','Geography']
@@ -99,9 +99,9 @@ training:
 model:
   model_type: "random_forest"
   training_strategy: "cv"
-  data_path: "Data/Raw/ChurnModelling.csv"
-  model_path: "Artifacts/Models/random_forest_cv_model.pkl"
-  evaluation_path: "Artifacts/Evaluation/random_forest_cv_evaluation_report.txt"
+  data_path: "data/raw/ChurnModelling.csv"
+  model_path: "artifacts/models/random_forest_cv_model.pkl"
+  evaluation_path: "artifacts/evaluation/random_forest_cv_evaluation_report.txt"
   model_params:
     n_estimators: 100
     max_depth: 10
@@ -139,9 +139,9 @@ deployment:
 
 inference:
   model_name: "random_forest_cv_model"
-  data_path: "Artifacts/Data/X_test.csv"
+  data_path: "artifacts/data/X_test.csv"
   sample_size: 100
-  save_path: "Artifacts/Predictions/predictions.csv"
+  save_path: "artifacts/predictions/predictions.csv"
   batch_size: 1000
   return_proba: true
 

@@ -43,7 +43,7 @@ class FillMissingValueStrategy(MissingValueHandlingStrategy):
     def handle_missing_values(self, df):
         if self.is_customer_imputer:
             return self.custom_imputer.impute(df)
-        df_imputed= df[self.imputing_column].fillna(df[self.imputing_column].mean())
+        df[self.imputing_column]= df[self.imputing_column].fillna(df[self.imputing_column].mean())
         logging.info(f"Filled missing values with {self.imputing_column} mean")
         return df
 

@@ -23,10 +23,10 @@ class TrainTestSplit(DataSplitter):
         X_train,X_test,y_train,y_test= train_test_split(X,Y,test_size= self.test_size,random_state= self.random_state)
         logging.info(f" Train test split applied successfully")
 
-        X_train.to_csv("Artifacts/Data_splits/X_train.csv", index=False)
-        X_test.to_csv("Artifacts/Data_splits/X_test.csv", index=False)
-        y_train.to_csv("Artifacts/Data_splits/y_train.csv", index=False)
-        y_test.to_csv("Artifacts/Data_splits/y_test.csv", index=False)
-        logging.info("Data splits saved to artifacts/Splits as CSV")
+        X_train.to_csv("artifacts/data_splits/X_train.csv", index=False)
+        X_test.to_csv("artifacts/data_splits/X_test.csv", index=False)
+        y_train.to_csv("artifacts/data_splits/y_train.csv", index=False)
+        y_test.to_csv("artifacts/data_splits/y_test.csv", index=False)
+        logging.info("Data splits saved to artifacts/data_splits as CSV")
         return X_train,X_test,y_train,y_test
         
