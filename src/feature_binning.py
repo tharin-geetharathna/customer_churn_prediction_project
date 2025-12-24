@@ -16,6 +16,9 @@ class CustomBinningStrategy(FeatureBinningStrategy):
     def bin(self,df,column_name):
         def custom_binning(score):
             for bin_label,bin_range in self.bin_mapping.items():
+                if bin_range[1]==850:
+                    return bin_label
+
                 if  bin_range[0] <= score < bin_range[1]:
                     return bin_label
             raise ValueError(f"Score {score} is not in any bin range")

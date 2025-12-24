@@ -82,7 +82,11 @@ def datapipeline(
     df= outlier_detector.handle_outliers(df,outlier_columns= columns['outlier_columns'])
     print(f"Shape of the data after handling outliers {df.shape}")
 
-
+    print("4. Feature binning")
+    binning_handler= CustomBinningStrategy(bin_mapping= binning_config['credit_score_binning'])
+    df = binning_handler.bin(df,column_name='CreditScore')
+    print(f"Shape of the data after feature_binning {df.shape}")
+    print(f"Values in the column credit score binned : {df['CreditScore_binned'].value_counts()}")
 
 
     
