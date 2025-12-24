@@ -18,8 +18,8 @@ class SMOTESampling(DataSamplingStrategy):
 
     def sample_data(self,X_train,y_train):
         X_train_resampled,y_train_resampled= self.smote.fit_resample(X_train,y_train)
-        X_train_resampled.to_csv("artifacts/data_splits/X_train_resampled.csv", index=False)
-        y_train_resampled.to_csv("artifacts/data_splits/y_train_resampled.csv",index= False)
+        X_train_resampled.to_csv("artifacts/data_splits/X_train.csv", index=False)
+        y_train_resampled.to_csv("artifacts/data_splits/y_train.csv",index= False)
         logging.info(f"SMOTE sampling applied successfully")
         return X_train_resampled,y_train_resampled
 

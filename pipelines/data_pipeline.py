@@ -108,17 +108,17 @@ def datapipeline(
     print("8. Feature scaling")
     standard_scaler= StandardScaling()
     X_train= standard_scaler.scale_features(X_train,scale_columns= scaling_config['columns_to_scale'] )
-    X_train.to_csv("artifacts/data_splits/X_train_scaled.csv", index=False)
+    X_train.to_csv("artifacts/data_splits/X_train.csv", index=False)
     print("Training data after scaled\n",X_train.head())
     X_test= standard_scaler.transform_features(X_test,scale_columns= scaling_config['columns_to_scale'] )
-    X_test.to_csv("artifacts/data_splits/X_test_scaled.csv", index=False)
+    X_test.to_csv("artifacts/data_splits/X_test.csv", index=False)
     print("Testing data after scaled\n",X_test.head())
 
     print("9. Sampling")
     smote_sampling = SMOTESampling(random_state= training_config['random_state'])
-    X_train_resampled,y_train_resampled= smote_sampling.sample_data(X_train,y_train)
-    print(f"Shape of the train data after sampling {X_train_resampled.shape}")
-    print(f"Shape of the test data after sampling {y_train_resampled.shape}")
+    X_train,y_train= smote_sampling.sample_data(X_train,y_train)
+    print(f"Shape of the train data after sampling {X_train.shape}")
+    print(f"Shape of the test data after sampling {y_train.shape}")
 
 
 
