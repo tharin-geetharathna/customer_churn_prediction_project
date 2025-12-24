@@ -9,7 +9,7 @@ class FeatureEncodingStrategy(ABC):
     def encode(self,df: pd.DataFrame)-> pd.DataFrame:
         pass
 
-class Ordinalencoding(FeatureEncodingStrategy):
+class OrdinalEncoding(FeatureEncodingStrategy):
     def __init__(self,ordinal_mapping):
         self.ordinal_mapping= ordinal_mapping
         logging.info(f" Ordinal encoding initalized with mapping. ")
@@ -25,7 +25,7 @@ class Ordinalencoding(FeatureEncodingStrategy):
 class NominalEncoding(FeatureEncodingStrategy):
     def __init__(self,nominal_columns):
         self.nominal_columns = nominal_columns
-        self.ohe= OneHotEncoder(sparse_output= False,handle_unknown='ignore',drop='first').set_output(transform='pandas')
+        self.ohe= OneHotEncoder(sparse_output= False,handle_unknown='ignore',drop='if_binary').set_output(transform='pandas')
         logging.info(f" One hot encoding initialized")
 
     def encode(self,df):
@@ -33,7 +33,8 @@ class NominalEncoding(FeatureEncodingStrategy):
             ohe_transformed_df= self.ohe.fit_transform(df[[column]])
             del df[column]
             df= pd.concat([df,ohe_transformed_df],axis=1)
-            logging.info(f" One hot encoding applied to {column} successfully")
+            logging.info(f"New encoded features are {ohe_transformed_df.columns.tolist()}")
+            logging.info(f"One hot encoding applied to {column} successfully")
         logging.info(f"One hot encoding successfully applied to nominal columns")
         return df
 

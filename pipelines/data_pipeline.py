@@ -15,7 +15,7 @@ from data_ingestion import DataIngestorCSV
 from handle_missing_values import DropMissingValues,FillMissingValueStrategy,GenderImputer
 from outlier_detection import IQROutlierDetection,OutlierDetector
 from feature_binning import CustomBinningStrategy
-from feature_encoding import NominalEncoding,Ordinalencoding
+from feature_encoding import NominalEncoding,OrdinalEncoding
 from feature_scaling import MinMaxScaler
 from data_sampling import SMOTESampling
 from data_splitter import TrainTestSplit
@@ -87,6 +87,14 @@ def datapipeline(
     df = binning_handler.bin(df,column_name='CreditScore')
     print(f"Shape of the data after feature_binning {df.shape}")
     print(f"Values in the column credit score binned : {df['CreditScore_binned'].value_counts()}")
+
+    print("5. Feature encoding")
+    nominal_encoding= NominalEncoding(nominal_columns= encoding_config['nominal_columns'])
+    ordinal_encoding= OrdinalEncoding (ordinal_mapping= encoding_config['ordinal_mapping'])
+    df= nominal_encoding.encode(df)
+    df= ordinal_encoding.encode(df)
+    print(f"Shape of the data after feature encoding {df.shape}")
+    
 
 
     

@@ -67,7 +67,7 @@ feature_binning:
 feature_encoding:
   nominal_columns: ['Geography','Gender']
   ordinal_mapping:
-    CreditScoreBins:
+    CreditScore_binned:
       Poor: 0
       Fair: 1
       Good: 2
