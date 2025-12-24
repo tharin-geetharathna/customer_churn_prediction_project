@@ -42,6 +42,7 @@ class RandomforestModelBuilder(BaseModelBuilder):
                         'min_samples_split': 2,
                         'min_samples_leaf':1,
                         'random_state': 42
+                        
                         }
         default_params.update(kwargs)
         super().__init__(model_name='RandomForest',**default_params)
@@ -51,7 +52,7 @@ class RandomforestModelBuilder(BaseModelBuilder):
         logging.info("RandomForest model built successfully")
         return self.model
     
-class XGBoostModeBuilder(BaseModelBuilder):
+class XGBoostModelBuilder(BaseModelBuilder):
     def __init__(self,**kwargs):
          default_params={
                         'n_estimators': 100,
@@ -65,3 +66,5 @@ class XGBoostModeBuilder(BaseModelBuilder):
     
     def build_model(self):
         self.model= XGBClassifier(**self.model_params)
+        logging.info("XGBoost model built successfully")
+        return self.model
