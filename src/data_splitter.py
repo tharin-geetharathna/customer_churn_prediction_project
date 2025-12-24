@@ -1,4 +1,5 @@
 import pandas as pd
+import os 
 import logging 
 from abc import ABC, abstractmethod
 from sklearn.model_selection import train_test_split
@@ -8,7 +9,7 @@ logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - 
 
 class DataSplitter(ABC):
     @abstractmethod
-    def split_data(self,df: pd.DataFrame,target_column:str)-> Tuple[pd.DataFrame,pd.DataFrame,pd.Series,pd.Series]:
+    def split_data(self,df: pd.DataFrame,target_column:str)-> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame]:
         pass
 
 class TrainTestSplit(DataSplitter):
@@ -23,6 +24,7 @@ class TrainTestSplit(DataSplitter):
         X_train,X_test,y_train,y_test= train_test_split(X,Y,test_size= self.test_size,random_state= self.random_state)
         logging.info(f" Train test split applied successfully")
 
+        os.makedirs('artifacts/data_splits', exist_ok=True)
         X_train.to_csv("artifacts/data_splits/X_train.csv", index=False)
         X_test.to_csv("artifacts/data_splits/X_test.csv", index=False)
         y_train.to_csv("artifacts/data_splits/y_train.csv", index=False)

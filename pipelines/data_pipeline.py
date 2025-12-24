@@ -12,15 +12,15 @@ logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - 
 
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','src'))
 from data_ingestion import DataIngestorCSV
-from handle_missing_values import DropMissingValues,FillMissingValueStrategy,GenderImputer
+from handle_missing_values import DropMissingValues,FillMissingValueStrategy,GenderImputer,DropFeatures
 from outlier_detection import IQROutlierDetection,OutlierDetector
 from feature_binning import CustomBinningStrategy
 from feature_encoding import NominalEncoding,OrdinalEncoding
-from feature_scaling import MinMaxScaler
+from feature_scaling import MinMaxScaling,StandardScaling
 from data_sampling import SMOTESampling
 from data_splitter import TrainTestSplit
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
-from config import get_data_paths,get_columns,get_missing_values_config,get_outlier_config,get_binning_config,get_encoding_config,get_scaling_config,get_splitting_config
+from config import get_data_paths,get_columns,get_missing_values_config,get_outlier_config,get_binning_config,get_encoding_config,get_scaling_config,get_splitting_config,get_training_config
 
 def datapipeline(
         data_path: str= 'data/raw/ChurnModelling.csv',
@@ -37,6 +37,7 @@ def datapipeline(
     encoding_config =  get_encoding_config()
     scaling_config= get_scaling_config()
     splitting_config= get_splitting_config()
+    training_config= get_training_config()
 
     print("1. Data ingestion")
     artificats_dir = os.path.join(os.path.dirname(__file__),'..',data_paths['data_artifacts_dir'])
@@ -94,7 +95,31 @@ def datapipeline(
     df= nominal_encoding.encode(df)
     df= ordinal_encoding.encode(df)
     print(f"Shape of the data after feature encoding {df.shape}")
-    
+
+    print("6. Feature dropping")
+    feature_drop_handler= DropFeatures(drop_columns=columns['drop_columns'])
+    df= feature_drop_handler.drop_features(df)
+
+    print("7. Data Splitting")
+    train_test_split= TrainTestSplit(test_size=training_config['test_size'],random_state=training_config['random_state'])
+    X_train,X_test,y_train,y_test = train_test_split.split_data(df,target_column=columns['target_columns'])
+
+
+    print("8. Feature scaling")
+    standard_scaler= StandardScaling()
+    X_train= standard_scaler.scale_features(X_train,scale_columns= scaling_config['columns_to_scale'] )
+    X_train.to_csv("artifacts/data_splits/X_train_scaled.csv", index=False)
+    print("Training data after scaled\n",X_train.head())
+    X_test= standard_scaler.transform_features(X_test,scale_columns= scaling_config['columns_to_scale'] )
+    X_test.to_csv("artifacts/data_splits/X_test_scaled.csv", index=False)
+    print("Testing data after scaled\n",X_test.head())
+
+    print("9. Sampling")
+    smote_sampling = SMOTESampling(random_state= training_config['random_state'])
+    X_train_resampled,y_train_resampled= smote_sampling.sample_data(X_train,y_train)
+    print(f"Shape of the train data after sampling {X_train_resampled.shape}")
+    print(f"Shape of the test data after sampling {y_train_resampled.shape}")
+
 
 
     

@@ -15,7 +15,7 @@ data_paths:
 
 columns:
   target_columns: 'Exited'
-  drop_columns: ['CustomerId','RowNumber']
+  drop_columns: ['CustomerId','RowNumber','Firstname','Lastname']
   outlier_columns: ['Age','CreditScore']
   numerical_columns: ['Balance','EstimatedSalary']
   critical_columns: ['Firstname']

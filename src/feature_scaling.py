@@ -18,10 +18,14 @@ class StandardScaling(FeatureScalingStrategy):
         logging.info(f" Standard scaling initialized")
 
     def scale_features(self, df, scale_columns):
-        for column in scale_columns:
-            df[column] = self.standard_scaler.fit_transform(df[[column]])
-            self.fitted= True
-            logging.info(f" Standard scaling applied to {column} successfully")
+        df[scale_columns] = self.standard_scaler.fit_transform(df[scale_columns])
+        self.fitted= True
+        logging.info(f" Standard scaling fitted and transformed for columns: {scale_columns} successfully")
+        return df
+    
+    def transform_features(self,df,scale_columns):
+        df[scale_columns]= self.get_scaler().transform(df[scale_columns])
+        logging.info(f"Transformed {scale_columns} successfully")
         return df
     
     def get_scaler(self):
@@ -33,12 +37,18 @@ class MinMaxScaling(FeatureScalingStrategy):
         self.fitted= False
         logging.info(f"MinMax scaling initialized")
     
-    def scale_features(self, df, scale_columns):
+    def scale_features(self, train_df, scale_columns):
         for column in scale_columns:
-            df[column] =  self.min_max_scaler.fit_transform(df[[column]])
+            train_df[column] =  self.min_max_scaler.fit_transform(train_df[[column]])
             self.fitted= True
             logging.info(f" MinMax scaling applied to {column} successfully")
-        return df
+        return train_df
+    
+    def transform_features(self,test_df,scale_columns):
+        for column in scale_columns:
+            test_df[column]= self.get_scaler().transform(test_df[[column]])
+            logging.info(f"Transformed {column} successfully")
+        return test_df
     
     def get_scaler(self):
         return self.min_max_scaler

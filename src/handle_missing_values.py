@@ -3,6 +3,7 @@ import groq
 import logging
 from abc import ABC,abstractmethod
 from pydantic import BaseModel
+from typing import List
 import pandas as pd
 logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
 from dotenv import load_dotenv
@@ -25,6 +26,15 @@ class DropMissingValues(MissingValueHandlingStrategy):
         n_dropped = len(df)- len(drop_cleaned_df)
         logging.info(f"Dropped {n_dropped} rows due to missing values")
         return drop_cleaned_df
+class DropFeatures():
+    def __init__(self,drop_columns:List[str]):
+        self.drop_columns= drop_columns
+    
+    def drop_features(self,df):
+        drop_cleaned_df= df.drop(self.drop_columns,axis=1)
+        logging.info(f"Dropped {self.drop_columns} columns")
+        return drop_cleaned_df
+        
     
 class FillMissingValueStrategy(MissingValueHandlingStrategy):
     def __init__(self,
