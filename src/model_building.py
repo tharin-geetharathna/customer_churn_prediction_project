@@ -33,6 +33,7 @@ class BaseModelBuilder(ABC):
             raise FileNotFoundError(f"Model is not found at {file_path}")
         self.model= joblib.load(file_path)
         logging.info(f"Model loaded successfully from {file_path}")
+        return self.model
 
 class RandomforestModelBuilder(BaseModelBuilder):
     def __init__(self,**kwargs):
