@@ -5,6 +5,8 @@ from typing import Dict
 import pandas as pd
 import json
 from pathlib import Path
+import warnings
+warnings.filterwarnings('ignore')
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

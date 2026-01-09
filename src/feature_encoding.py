@@ -37,6 +37,15 @@ class NominalEncoding(FeatureEncodingStrategy):
             logging.info(f"One hot encoding applied to {column} successfully")
         logging.info(f"One hot encoding successfully applied to nominal columns")
         return df
+    
+    def transform_features(self,df):
+        for column in self.nominal_columns:
+            ohe_transformed_df =  self.ohe.transform(df[[column]])
+            del df[column]
+            df= pd.concat([df,ohe_transformed_df],axis=1)
+        logging.info(f" Features are nominal encoded for inferencing")
+        return df
+
 
     
 

@@ -11,6 +11,12 @@ data_paths:
   X_test: 'artifacts/data_splits/X_test.csv'
   y_train: 'artifacts/data_splits/y_train.csv'
   y_test: 'artifacts/data_splits/y_test.csv'
+  preprocessors_dir: 'artifacts/preprocessors'
+  binning_handler: 'artifacts/preprocessors/binning_handler.joblib'
+  nominal_encoder_handler: 'artifacts/preprocessors/nominal_encoder_handler.joblib'
+  ordinal_encoder_handler: 'artifacts/preprocessors/ordinal_encoder_handler.joblib'
+  scaling_handler: 'artifacts/preprocessors/scaling_handler.joblib'
+  feature_order: 'artifacts/preprocessors/feature_order.json'
   temporary_imputed: 'data/processed/temporary_imputed.csv'
 
 

@@ -6,7 +6,10 @@ import pandas as pd
 import numpy as np
 from typing import Dict
 import matplotlib.pyplot as plt
+import joblib
 import json
+import warnings
+warnings.filterwarnings('ignore')
 
 logging.basicConfig(level= logging.INFO, format= '%(asctime)s - %(levelname)s - %(message)s')
 
@@ -23,7 +26,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__),'..','utils'))
 from config import get_data_paths,get_columns,get_missing_values_config,get_outlier_config,get_binning_config,get_encoding_config,get_scaling_config,get_splitting_config,get_training_config
 
 def datapipeline(
-        data_path: str= 'data/raw/ChurnModelling.csv',
         target_column: str = 'Exited',
         test_size: float= 0.2,
         force_rebuild: bool = False
@@ -56,7 +58,7 @@ def datapipeline(
         y_test= pd.read_csv(y_test_path)
 
     ingestor=  DataIngestorCSV()
-    df= ingestor.ingest(data_path)
+    df= ingestor.ingest(data_paths['raw_data'])
     print(f"Shape of the data after ingestion { df.shape}")
 
     print("2. Handling missing values")
@@ -108,10 +110,8 @@ def datapipeline(
     print("8. Feature scaling")
     standard_scaler= StandardScaling()
     X_train= standard_scaler.scale_features(X_train,scale_columns= scaling_config['columns_to_scale'] )
-    X_train.to_csv("artifacts/data_splits/X_train.csv", index=False)
     print("Training data after scaled\n",X_train.head())
     X_test= standard_scaler.transform_features(X_test,scale_columns= scaling_config['columns_to_scale'] )
-    X_test.to_csv("artifacts/data_splits/X_test.csv", index=False)
     print("Testing data after scaled\n",X_test.head())
 
     print("9. Sampling")
@@ -119,6 +119,28 @@ def datapipeline(
     X_train,y_train= smote_sampling.sample_data(X_train,y_train)
     print(f"Shape of the train data after sampling {X_train.shape}")
     print(f"Shape of the test data after sampling {y_train.shape}")
+
+    # Saving the data splits
+    os.makedirs('artifacts/data_splits', exist_ok=True)
+    X_train.to_csv("artifacts/data_splits/X_train.csv", index=False)
+    X_test.to_csv("artifacts/data_splits/X_test.csv", index=False)
+    y_train.to_csv("artifacts/data_splits/y_train.csv", index=False)
+    y_test.to_csv("artifacts/data_splits/y_test.csv", index=False)
+    logging.info("Data splits saved after preprocessing to artifacts/data_splits as CSV")
+
+    ### Dumping the preprocessors
+    os.makedirs(data_paths['preprocessors_dir'],exist_ok=True)
+    joblib.dump(binning_handler,data_paths['binning_handler'])
+    joblib.dump(nominal_encoding,data_paths['nominal_encoder_handler'])
+    joblib.dump(ordinal_encoding,data_paths['ordinal_encoder_handler'])
+    joblib.dump(standard_scaler,data_paths['scaling_handler'])
+    logging.info("Preprocessors saved successfully")
+
+    feature_order = X_train.columns.tolist()
+    with open(data_paths['feature_order'],'w') as file:
+        json.dump(feature_order,file)
+        logging.info(f"Feature order saved to {data_paths['feature_order']}")
+    
 
 
 
