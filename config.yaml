@@ -168,7 +168,7 @@ mlflow:
     project: "customer_churn_prediction"
     team: "ml_team"
     environment: "development"
-  artifact_path: "models"
+  artifact_path: "model"
 
 environment:
   experiment_name: "churn_analysis"

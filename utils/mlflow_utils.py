@@ -2,10 +2,11 @@ import mlflow
 import mlflow.sklearn
 import os
 import json
-from typing import Dict,Any , Optional
+from typing import Dict,Any , Optional, Union
+import numpy as np
 from datetime import datetime
 import logging
-logging.basicConfig(level=INFO,format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO,format="%(asctime)s - %(levelname)s - %(message)s")
 
 from config import get_mlflow_config
 
@@ -97,17 +98,132 @@ class MLflowTracker:
             #Log training metrics
             mlflow.log_metrics(training_metrics)
 
-            artifact_path = f"{self.config.get('artifact_path','models')}/{model_name}"
+            artifact_path = self.config.get('artifact_path','model')
+
+            registered_model_name = f"churn_prediction_{model_name}"
+
             mlflow.sklearn.log_model(
                 sk_model = model,
                 artifact_path = artifact_path,
-                registered_model_name = f"churn_prediction_{model_name}"
+                registered_model_name = registered_model_name
             )
             logging.info(f"Logged model {model_name} successfully to MlFlow")
         
         except Exception as e:
             logging.error(f"Error logging trainining metrics to MlFlow. {e}")
             raise e
+        
+    def log_evaluation_metrics(self,evaluation_metrics: Dict[str, Any],confusion_matrix_path : Optional[str] = None):
+        """Log evaluations metrics to MLflow"""
+        try:
+            if 'metrics' in evaluation_metrics:
+                mlflow.log_metrics(evaluation_metrics.get('metrics'))
+            if confusion_matrix_path and os.path.exists(confusion_matrix_path):
+                mlflow.log_artifact(local_path = confusion_matrix_path, artifact_path = "evaluation")
+            
+            logging.info("Logged evaluation metrics to MLflow")
+        except Exception as e:
+            logging.error(f"Error logging evaluation metrics to MLflow. {e}")
+            raise e
+
+
+    def log_inference_metrics(self,predictions: np.ndarray, probabilities: Optional[np.ndarray] = None,
+                                additional_data: Optional[Dict[str, Any]] = None):
+        """Log inference metrics to MLflow"""
+        try:
+            inference_metrics = {
+                "num_predictions" : len(predictions),
+                'churn_count': int(np.sum(predictions)),
+                'retain_count' : int(len(predictions) -  np.sum(predictions))
+            }
+
+            if probabilities is not None:
+                inference_metrics.update({
+                    "average_churn_probability": float(np.mean(probabilities)),
+                    "high_churn_probability": int(np.sum(probabilities> 0.7)),
+                    "medium_churn_probaility": int(np.sum((probabilities>0.5) & (probabilities<=0.7))),
+                    "low_churn_probability": int(np.sum(probabilities<=0.5))
+                })
+
+            mlflow.log_metrics(inference_metrics)
+
+            if additional_data:
+                mlflow.log_params(additional_data)
+
+            logging.info("Logged inference metrics to MLflow")
+
+        except Exception as e:
+            logging.error(f"Error logging inference metrics to MLflow. {e}")
+            raise e
+        
+    def load_model_from_registry(self,model_name:str,version: Optional[str]= None, stage : Optional[str]= None):
+        """ Load model from MLflow registry"""
+        try:
+            registered_model_name = f"churn_prediction_{model_name}"
+            if version:
+                model_uri = f"models:/{registered_model_name}/{version}"
+            elif stage:
+                model_uri = f"models:/{registered_model_name}/{stage}"
+            else:
+                model_uri = f"models:/{registered_model_name}/latest"
+            
+            model = mlflow.sklearn.load_model(model_uri)
+            logging.info(f"Loaded model {registered_model_name} from MLflow registry")
+            return model
+        
+        except Exception as e:
+            logging.error(f"Error loading model {registered_model_name} from MLflow registry. {e}")
+            raise e
+        
+    def get_latest_model_version(self,model_name):
+        """ Get latest model version from MLflow registry"""
+        try:
+            registered_model_name = f"churn_prediction_{model_name}"
+            client = mlflow.tracking.Mlflowclient()
+            latest_version = client.get_latest_versions(registered_model_name,stages=['None','Staging','Production'])
+            if latest_version:
+                return latest_version[0].version
+            return None
+        except Exception as e:
+            logging.error(f"Error getting latest model version from MLflow registry. {e}")
+
+    def transition_model_stage(self,model_name:str, version:Optional[str] = None,stage:str="Staging"):
+        """Transition model to a specific stage"""
+        try:
+            registered_model_name = f"churn_prediction_{model_name}"
+            if version is None:
+                version = self.get_latest_model_version(registered_model_name)
+            
+            if version:
+                client = mlflow.tracking.MlflowClient()
+                client.transition_model_version_stage(
+                    name =  registered_model_name,
+                    version = version,
+                    stage = stage
+                )
+                logging.info(f"Transitioned model {registered_model_name} to stage {stage}")
+        except Exception as e:
+            logging.error(f"Error transitioning model to stage {stage}. {e}")
+            raise e
+        
+    def end_run(self):
+        """End the current MLflow run"""
+        try:
+            mlflow.end_run()
+            logging.info("Ended the current MLflow run")
+        except Exception as e:
+            logging.error(f"Error ending the MLflow run: {e}")
+
+    def setup_autolog():
+        """Setup Mlflow autologging for supported frameworks """
+        try:
+            mlflow_config = get_mlflow_config()
+            if mlflow_config.get('autolog',True):
+                 mlflow.sklearn.autolog()
+                 logging.info("Enabled autologging for scikit-learn")
+    
+        except Exception as e:
+            logging.error(f"Error enabling autologging for scikit-learn. {e}")
 
         
 
