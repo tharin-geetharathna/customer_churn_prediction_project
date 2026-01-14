@@ -38,7 +38,7 @@ if __name__=="__main__":
     "HasCrCard": 1,
     "IsActiveMember": 0,
     "EstimatedSalary": 750.00
-}
+    }
     
     output_rfc= inference_pipeline(model_name='random_forest',data= user_data)
     output_xgb= inference_pipeline(model_name='xgboost',data= user_data)

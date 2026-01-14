@@ -110,6 +110,10 @@ def get_data_config() ->Dict[str, Any]:
     config = get_config()
     return config.get('data', {})
 
+def get_mlflow_config() ->Dict[str,Any]:
+    config= get_config()
+    return config.get('mlflow',{})
+
 
 def get_preprocessing_config() ->Dict[str, Any]:
     config = get_config()

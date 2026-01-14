@@ -160,16 +160,15 @@ logging:
   file: "pipeline.log"
 
 mlflow:
-  tracking_uri: "file:./mlruns"  # Local file-based tracking
-  experiment_name: "Zuu Crew Churn Analysis"
-  model_registry_name: "churn_prediction"
-  artifact_path: "model"
-  run_name_prefix: "churn_run"
+  tracking_uri: "file:./mlruns"
+  experiment_name: "Churn_analysis"
+  run_name_prefix: "churn_pipeline"
+  autolog: true
   tags:
     project: "customer_churn_prediction"
-    team: "ml_engineering"
+    team: "ml_team"
     environment: "development"
-  autolog: true
+  artifact_path: "models"
 
 environment:
   experiment_name: "churn_analysis"

@@ -140,9 +140,3 @@ def datapipeline(
     with open(data_paths['feature_order'],'w') as file:
         json.dump(feature_order,file)
         logging.info(f"Feature order saved to {data_paths['feature_order']}")
-    
-
-
-
-    
-datapipeline()
