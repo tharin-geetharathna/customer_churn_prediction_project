@@ -23,15 +23,15 @@ class MLflowTracker:
         experiment_name = self.config.get('experiment_name','Churn_analysis')
 
         try:
-            experiment_name= mlflow.get_experiment_by_name(experiment_name)
-            if experiment_name is None:
+            existing_experiment= mlflow.get_experiment_by_name(experiment_name)
+            if existing_experiment is None:
                 experiment_id= mlflow.create_experiment(experiment_name)
                 logging.info(f"Experiment {experiment_name} created successfully with id {experiment_id}")
             else:
-                experiment_id = experiment_name.experiment_id
+                experiment_id = existing_experiment.experiment_id
                 logging.info(f"Using existing experiment with name : {experiment_name} and id {experiment_id}")
 
-            mlflow.set_experiment(experiment_id)
+            mlflow.set_experiment(experiment_name)
             logging.info(f"Experiment {experiment_name} set successfully")
 
         except Exception as e:
@@ -43,7 +43,7 @@ class MLflowTracker:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if run_name is None:
-            run_name = self.config.get(run_name_prefix,'run')
+            run_name = self.config.get('run_name_prefix','run')
             run_name_prefix = run_name.replace("_"," ")
             run_name = f"{run_name_prefix} | {timestamp}"
         else:
@@ -82,7 +82,7 @@ class MLflowTracker:
             })
 
             if 'feature_names' in dataset_info:
-                mlflow.log_param("features", str(dataset_info.get['feature_names']))
+                mlflow.log_param("features", str(dataset_info.get('feature_names')))
 
             logging.info("Logged data pipeline to MlFlow")
 
@@ -179,7 +179,7 @@ class MLflowTracker:
         """ Get latest model version from MLflow registry"""
         try:
             registered_model_name = f"churn_prediction_{model_name}"
-            client = mlflow.tracking.Mlflowclient()
+            client = mlflow.tracking.MlflowClient()
             latest_version = client.get_latest_versions(registered_model_name,stages=['None','Staging','Production'])
             if latest_version:
                 return latest_version[0].version
@@ -214,24 +214,28 @@ class MLflowTracker:
         except Exception as e:
             logging.error(f"Error ending the MLflow run: {e}")
 
-    def setup_autolog():
-        """Setup Mlflow autologging for supported frameworks """
-        try:
-            mlflow_config = get_mlflow_config()
-            if mlflow_config.get('autolog',True):
-                 mlflow.sklearn.autolog()
-                 logging.info("Enabled autologging for scikit-learn")
-    
-        except Exception as e:
-            logging.error(f"Error enabling autologging for scikit-learn. {e}")
+def setup_autolog():
+    """Setup Mlflow autologging for supported frameworks """
+    try:
+        mlflow_config = get_mlflow_config()
+        if mlflow_config.get('autolog',True):
+                mlflow.sklearn.autolog()
+                logging.info("Enabled autologging for scikit-learn")
 
-        
+    except Exception as e:
+        logging.error(f"Error enabling autologging for scikit-learn. {e}")
 
     
 
+def create_mlflow_run_tags(pipeline_name: str, additional_tags: Optional[Dict[str,str]]= None)-> Dict[str,str]:
+    """Create MLflow run tags"""
+    tags = {
+        'pipeline_name': pipeline_name,
+        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
 
+    if additional_tags:
+        tags.update(additional_tags)
 
-
-        
+    return tags
     
-    def setup_experiment(self):

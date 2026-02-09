@@ -1,0 +1,8 @@
+artifact_location: file:///Users/tharingeetharathna/Desktop/ZuuCrewCourse/Week 5-6/mlruns/357298001545537700
+creation_time: 1769139865362
+experiment_id: '357298001545537700'
+last_update_time: 1769143198814
+lifecycle_stage: deleted
+name: '160361140494753203'
+tags:
+  mlflow.experimentKind: custom_model_development

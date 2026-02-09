@@ -22,6 +22,7 @@ from model_building import RandomforestModelBuilder,XGBoostModelBuilder
 from model_training import ModelTraining
 from model_evaluation import ModelEvaluator
 from config import get_training_config,get_data_paths,get_model_config,get_columns
+from mlflow_utils import MLflowTracker, mlflow_autolog, create_mlflow_run_tags
 
 def training_pipeline(
                     random_state: int =42,
@@ -41,6 +42,17 @@ def training_pipeline(
         datapipeline()
     else:
         print("Loading data artifacts from data pipeline")
+
+    #Initiate MLflow tracker 
+    mlflow_tracker = MLflowTracker()
+    run_tags=create_mlflow_run_tags(pipeline_name= 'training_pipeline',additional_tags= {'models','random_forest','xgboost'})
+    run = mlflow_tracker.start_run(run_name= 'training_pipeline',tags= run_tags)
+
+
+
+
+
+
     X_train = pd.read_csv(data_paths['X_train'])
     X_test = pd.read_csv(data_paths['X_test'])
     y_train = pd.read_csv(data_paths['y_train'])

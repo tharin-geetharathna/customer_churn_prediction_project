@@ -161,7 +161,7 @@ logging:
 
 mlflow:
   tracking_uri: "file:./mlruns"
-  experiment_name: "Churn_analysis"
+  experiment_name: "churn_analysis"
   run_name_prefix: "churn_pipeline"
   autolog: true
   tags:

@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/tharingeetharathna/Desktop/ZuuCrewCourse/Week 5-6/mlruns/357298001545537700/d07a0d277d0449c294e0d3819dc96f7c/artifacts
+deleted_time: 1769143198814
+end_time: 1769140821796
+entry_point_name: ''
+experiment_id: '357298001545537700'
+lifecycle_stage: deleted
+run_id: d07a0d277d0449c294e0d3819dc96f7c
+run_name: data pipeline | 2026-01-23 09:30:21
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1769140821652
+status: 3
+tags: []
+user_id: tharingeetharathna

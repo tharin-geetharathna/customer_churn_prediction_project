@@ -1,0 +1,16 @@
+# env files
+.env
+.env.*
+
+# python
+__pycache__/
+*.pyc
+
+# node
+node_modules/
+
+# mac junk
+.DS_Store
+
+# vscode
+.vscode/
